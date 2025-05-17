@@ -1,0 +1,38 @@
+name: Daily Weather Reporter
+
+on:
+  schedule:
+    - cron: "0 4 * * *"  # runs daily at 4:00 UTC
+  workflow_dispatch:
+
+jobs:
+  run-weather:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Tests
+        run: pytest test_weather_scraper.py
+
+      - name: Run Scraper
+        env:
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+        run: python weather_scraper.py
+
+      - name: Commit Weather Report
+        run: |
+          git config user.name github-actions
+          git config user.email actions@github.com
+          git add daily_weather.md
+          git commit -m "Update: Daily weather report" || echo "No changes"
+          git push
