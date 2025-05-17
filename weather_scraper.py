@@ -1,12 +1,16 @@
 import requests
 import os
 from datetime import datetime
+import sys
 
 API_KEY = os.getenv("OPENWEATHER_API_KEY")
 CITY = "Hyderabad"
 COUNTRY = "IN"
 
 def get_weather(city, api_key):
+    if not api_key:
+        raise ValueError("Missing API key. Set the OPENWEATHER_API_KEY environment variable.")
+
     url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
     response = requests.get(url)
     response.raise_for_status()
@@ -30,6 +34,11 @@ def save_report(report):
         f.write(report)
 
 if __name__ == "__main__":
-    data = get_weather(f"{CITY},{COUNTRY}", API_KEY)
-    report = format_report(data)
-    save_report(report)
+    try:
+        data = get_weather(f"{CITY},{COUNTRY}", API_KEY)
+        report = format_report(data)
+        save_report(report)
+        print("Weather report saved successfully.")
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
