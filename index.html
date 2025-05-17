@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hyderabad Weather Report</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    h1 { color: #333; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border: 1px solid #999; padding: 8px; }
+    .updated { font-size: 0.9em; color: gray; }
+  </style>
+</head>
+<body>
+  <h1>Hyderabad Weather Report</h1>
+  <div id="report">
+    Loading...
+  </div>
+  <script>
+    fetch('daily_weather.md')
+      .then(res => res.text())
+      .then(text => {
+        const html = text
+          .replace(/^#\s(.+)/gm, "<h2>$1</h2>")
+          .replace(/\*\*(.+?)\*\*: (.+)/g, "<tr><td><strong>$1</strong></td><td>$2</td></tr>");
+        document.getElementById('report').innerHTML = `<table>${html}</table>`;
+      })
+      .catch(err => {
+        document.getElementById('report').innerText = "Failed to load weather report.";
+      });
+  </script>
+  <p class="updated">Auto-updated daily via GitHub Actions</p>
+</body>
+</html>
